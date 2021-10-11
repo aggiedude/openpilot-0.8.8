@@ -3,11 +3,11 @@ from cereal import car
 from panda import Panda
 from common.numpy_fast import interp
 from common.params import Params
-from selfdrive.car.honda.values import CarControllerParams, CruiseButtons, CruiseSetting, CAR, HONDA_BOSCH, HONDA_BOSCH_ALT_BRAKE_SIGNAL, HONDA_NIDEC_ALT_LKAS_BUTTON
+from selfdrive.car.honda.values import CarControllerParams, CruiseButtons, CruiseSetting, CAR, HONDA_BOSCH, HONDA_BOSCH_ALT_BRAKE_SIGNAL, HONDA_NIDEC_ALT_LKAS_BUTTON, FINGERPRINTS
 from common.realtime import DT_CTRL
 from selfdrive.controls.lib.events import ET
 from selfdrive.car.honda.hondacan import disable_radar
-from selfdrive.car import STD_CARGO_KG, CivicParams, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint
+from selfdrive.car import STD_CARGO_KG, CivicParams, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint, is_ecu_disconnected
 from selfdrive.car.interfaces import CarInterfaceBase
 from selfdrive.config import Conversions as CV
 
@@ -91,6 +91,8 @@ class CarInterface(CarInterfaceBase):
 
     if candidate in HONDA_BOSCH:
       ret.safetyModel = car.CarParams.SafetyModel.hondaBoschHarness
+      # ECU_FINGERPRINT = { Ecu.fwdCamera: [0xE4, 0x194] }  # steer torque cmd
+      ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])
       ret.radarOffCan = True
 
       # Disable the radar and let openpilot control longitudinal
@@ -101,6 +103,8 @@ class CarInterface(CarInterfaceBase):
       ret.communityFeature = ret.openpilotLongitudinalControl
     else:
       ret.safetyModel = car.CarParams.SafetyModel.hondaNidec
+      # ECU_FINGERPRINT = { Ecu.fwdCamera: [0xE4, 0x194] }  # steer torque cmd
+      ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])      
       ret.enableGasInterceptor = 0x201 in fingerprint[0]
       ret.openpilotLongitudinalControl = True
 
