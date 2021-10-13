@@ -16,13 +16,13 @@ EXT_DIAG_RESPONSE = b'\x50\x03'
 COM_CONT_REQUEST = b'\x28\x83\x03'
 COM_CONT_RESPONSE = b''
 
-def has_relay():
-  if not hasattr(has_relay, "has_relay"):
-    has_relay.has_relay = Params().get("PandaType", encoding='utf8') > "2" # [0 = UNKNOWN, WHITE, GREY, BLACK, PEDAL, UNO, DOS]
-  return has_relay.has_relay
+#def has_relay():
+#  if not hasattr(has_relay, "has_relay"):
+#    has_relay.has_relay = Params().get("PandaType", encoding='utf8') > "2" # [0 = UNKNOWN, WHITE, GREY, BLACK, PEDAL, UNO, DOS]
+#  return has_relay.has_relay
 
 def get_pt_bus(car_fingerprint):
-    return 1 if car_fingerprint in HONDA_BOSCH and has_relay() else 0
+    return 0
 
 
 def get_lkas_cmd_bus(car_fingerprint, radar_disabled=False):
@@ -30,7 +30,7 @@ def get_lkas_cmd_bus(car_fingerprint, radar_disabled=False):
     # when radar is disabled, steering commands are sent directly to powertrain bus
     return get_pt_bus(car_fingerprint)
   # normally steering commands are sent to radar, which forwards them to powertrain bus
-  return 2 if car_fingerprint in HONDA_BOSCH and not has_relay() else 0
+  return 2
 
 
 def disable_radar(logcan, sendcan, bus=1, timeout=0.1, debug=False):

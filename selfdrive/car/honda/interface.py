@@ -90,21 +90,22 @@ class CarInterface(CarInterfaceBase):
     ret.carName = "honda"
 
     if candidate in HONDA_BOSCH:
-      ret.safetyModel = car.CarParams.SafetyModel.hondaBoschHarness
+      ret.safetyModel = car.CarParams.SafetyModel.hondaBoschGiraffe
       # ECU_FINGERPRINT = { Ecu.fwdCamera: [0xE4, 0x194] }  # steer torque cmd
-      ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])
+      #ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])
       ret.radarOffCan = True
 
       # Disable the radar and let openpilot control longitudinal
       # WARNING: THIS DISABLES AEB!
-      ret.openpilotLongitudinalControl = Params().get_bool("DisableRadar")
+      #ret.openpilotLongitudinalControl = Params().get_bool("DisableRadar")
+      ret.openpilotLongitudinalControl = False
 
       ret.pcmCruise = not ret.openpilotLongitudinalControl
       ret.communityFeature = ret.openpilotLongitudinalControl
     else:
       ret.safetyModel = car.CarParams.SafetyModel.hondaNidec
       # ECU_FINGERPRINT = { Ecu.fwdCamera: [0xE4, 0x194] }  # steer torque cmd
-      ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])      
+      #ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS[candidate], [0xE4, 0x194])      
       ret.enableGasInterceptor = 0x201 in fingerprint[0]
       ret.openpilotLongitudinalControl = True
 
@@ -115,7 +116,7 @@ class CarInterface(CarInterfaceBase):
       ret.enableBsm = 0x12f8bfa7 in fingerprint[0]
 
     # Accord 1.5T CVT has different gearbox message
-    if candidate == CAR.ACCORD and 0x191 in fingerprint[1]:
+    if candidate == CAR.ACCORD and 0x191 in fingerprint[0]:
       ret.transmissionType = TransmissionType.cvt
 
     # Certain Hondas have an extra steering sensor at the bottom of the steering rack,
